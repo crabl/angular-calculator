@@ -9,10 +9,13 @@
 angular.module('angularCalculatorApp')
   .directive('display', function () {
     return {
-      template: '<div class="display"></div>',
+    	scope: {
+    		contents: '@'
+    	},
+      template: '<input type="text" value="{{contents}}"></input>',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
-        element.text('this is the display directive');
+        //element.text('this is the display directive');
       }
     };
   });
