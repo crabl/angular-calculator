@@ -13,7 +13,7 @@ angular.module('angularCalculatorApp')
     		'value': '@',
     		'action': '&'
     	},
-      template: '<button>{{ value }}</button>',
+      template: '<material-button>{{ value }}</material-button>',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
         var button = element.find('button');

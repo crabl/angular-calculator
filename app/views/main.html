@@ -1,55 +1,57 @@
-<div class="row">
-	<div class="col-md-8">
-		<display contents="{{ model.display }}"></display>
-	</div>
-	<br />
-</div>
 
-<div class="row">
-	<div class="col-md-2" ng-controller="OperatorCtrl">
-		<calculator-button action="memoryKeyPressed(value)" value="m+"></calculator-button><br />
-		<calculator-button action="memoryKeyPressed(value)" value="m-"></calculator-button><br />
-		<calculator-button action="memoryKeyPressed(value)" value="mc"></calculator-button><br />
-		<calculator-button action="memoryKeyPressed(value)" value="mr"></calculator-button><br />
-		<calculator-button action="clearPressed()" value="c"></calculator-button>
+<material-card>
+	<div layout="horizontal">
+		<display contents="{{ model.display }}" flex></display>
 	</div>
 
-	<div class="col-md-2" ng-controller="OperatorCtrl">
-		<calculator-button action="unaryOperatorPressed(value)" value="1/x"></calculator-button><br />
-		<calculator-button action="unaryOperatorPressed(value)" value="&plus;/&minus;"></calculator-button><br />
-		<calculator-button action="unaryOperatorPressed(value)" value="sin"></calculator-button><br />
-		<calculator-button action="unaryOperatorPressed(value)" value="cos"></calculator-button><br />
-		<calculator-button action="unaryOperatorPressed(value)" value="tan"></calculator-button>
+	<div layout="horizontal">
+		<div layout="vertical" ng-controller="OperatorCtrl" class="calculator-keypad" flex="15">
+			<calculator-button action="memoryKeyPressed(value)" value="m+"></calculator-button><br />
+			<calculator-button action="memoryKeyPressed(value)" value="m-"></calculator-button><br />
+			<calculator-button action="memoryKeyPressed(value)" value="mc"></calculator-button><br />
+			<calculator-button action="memoryKeyPressed(value)" value="mr"></calculator-button><br />
+			<calculator-button action="clearPressed()" value="c"></calculator-button>
+		</div>
+
+		<div layout="vertical" ng-controller="OperatorCtrl" class="calculator-keypad" flex="15">
+			<calculator-button action="unaryOperatorPressed(value)" value="1/x"></calculator-button><br />
+			<calculator-button action="unaryOperatorPressed(value)" value="&plus;/&minus;"></calculator-button><br />
+			<calculator-button action="unaryOperatorPressed(value)" value="sin"></calculator-button><br />
+			<calculator-button action="unaryOperatorPressed(value)" value="cos"></calculator-button><br />
+			<calculator-button action="unaryOperatorPressed(value)" value="tan"></calculator-button>
+		</div>
+
+		<div layout="vertical" ng-controller="KeypadCtrl" class="calculator-keypad" flex="55">
+			<div layout="horizontal" flex>
+				<calculator-button action="numberPressed(value)" value="7" flex></calculator-button>
+				<calculator-button action="numberPressed(value)" value="8" flex></calculator-button>
+				<calculator-button action="numberPressed(value)" value="9" flex></calculator-button>
+			</div>
+
+			<div layout="horizontal" flex>
+				<calculator-button action="numberPressed(value)" value="4" flex></calculator-button>
+				<calculator-button action="numberPressed(value)" value="5" flex></calculator-button>
+				<calculator-button action="numberPressed(value)" value="6" flex></calculator-button>
+			</div>
+
+			<div layout="horizontal" flex>
+				<calculator-button action="numberPressed(value)" value="1"flex></calculator-button>
+				<calculator-button action="numberPressed(value)" value="2"flex></calculator-button>
+				<calculator-button action="numberPressed(value)" value="3"flex></calculator-button>
+			</div>
+
+			<div layout="horizontal" flex>
+				<calculator-button action="decimalPressed()" value="." flex="33"></calculator-button>
+				<calculator-button action="numberPressed(value)" value="0" flex="66"></calculator-button>
+			</div>
+		</div>
+
+		<div layout="vertical" ng-controller="OperatorCtrl" class="calculator-keypad" flex="15">
+			<calculator-button action="binaryOperatorPressed(value)" value="&divide;"></calculator-button><br />
+			<calculator-button action="binaryOperatorPressed(value)" value="&times;"></calculator-button><br />
+			<calculator-button action="binaryOperatorPressed(value)" value="&plus;"></calculator-button><br />
+			<calculator-button action="binaryOperatorPressed(value)" value="&minus;"></calculator-button><br />
+			<calculator-button action="equalsPressed()" value="&equals;"></calculator-button>
+		</div>
 	</div>
-
-	<div class="col-md-2" ng-controller="KeypadCtrl">
-		<calculator-button action="numberPressed(value)" value="7"></calculator-button>
-		<calculator-button action="numberPressed(value)" value="8"></calculator-button>
-		<calculator-button action="numberPressed(value)" value="9"></calculator-button>
-
-		<br />
-
-		<calculator-button action="numberPressed(value)" value="4"></calculator-button>
-		<calculator-button action="numberPressed(value)" value="5"></calculator-button>
-		<calculator-button action="numberPressed(value)" value="6"></calculator-button>
-
-		<br />
-
-		<calculator-button action="numberPressed(value)" value="1"></calculator-button>
-		<calculator-button action="numberPressed(value)" value="2"></calculator-button>
-		<calculator-button action="numberPressed(value)" value="3"></calculator-button>
-
-		<br />
-
-		<calculator-button action="decimalPressed()" value="."></calculator-button>
-		<calculator-button action="numberPressed(value)" value="0"></calculator-button>
-	</div>
-
-	<div class="col-md-1" ng-controller="OperatorCtrl">
-		<calculator-button action="binaryOperatorPressed(value)" value="&divide;"></calculator-button><br />
-		<calculator-button action="binaryOperatorPressed(value)" value="&times;"></calculator-button><br />
-		<calculator-button action="binaryOperatorPressed(value)" value="&plus;"></calculator-button><br />
-		<calculator-button action="binaryOperatorPressed(value)" value="&minus;"></calculator-button><br />
-		<calculator-button action="equalsPressed()" value="&equals;"></calculator-button>
-	</div>
-</div>
+</material-card>
