@@ -11,29 +11,23 @@ angular.module('angularCalculatorApp')
   .controller('MainCtrl', function ($scope) {
   	$scope.model = {
   		expression: [],
-  		buffer: [0],
+  		buffer: [],
   		display: '0'
   	};
 
   	$scope.decimalPressed = false;
   	$scope.equalsPressed = false;
+  	$scope.memoryRegister = 0;
 
     var buffer = {
     	push: function(value) {
-    		if ($scope.model.buffer[0] == 0) {
-    			$scope.model.buffer = [value];
-    		} else {
-    			$scope.model.buffer.push(value);
-    		}
-    		console.log('Buffer is:');
-    		console.log($scope.model.buffer);
-    		
+    		$scope.model.buffer.push(value);
     		return this.display();
     	},
     	eval: function() {
     		var buf = $scope.model.buffer.join('');
-    		if (buf === '.') {
-    			return '.';
+    		if (buf === '.' || buf === '') {
+    			return 0;
     		} else {
     			return eval(buf);
     		}
@@ -47,16 +41,17 @@ angular.module('angularCalculatorApp')
     		return this;
     	},
     	clear: function() {
-    		$scope.model.buffer = [0];
+    		$scope.model.buffer = [];
     		return this.display();
+    	},
+    	isEmpty: function() {
+    		return $scope.model.buffer.length == 0;
     	}
     };
 
     var expression = {
     	push: function(item) {
     		$scope.model.expression.push(item);
-    		console.log('Expression stack: ');
-    		console.log($scope.model.expression);
     		return this;
     	},
     	pop: function() {
@@ -81,83 +76,103 @@ angular.module('angularCalculatorApp')
     	clear: function() {
     		$scope.model.expression = [];
     		return this;
+    	},
+    	isEmpty: function() {
+    		return $scope.model.expression.length == 0;
     	}
     };
 
     $scope.model.display = buffer.clear().eval();
 
+    $scope.decimalAllowed = true;
+    $scope.tokenAllowed = true;
+
     $scope.$on('pressed.keypad.number', function(event, obj) {
-    	// push the number to the display buffer
-    	if ($scope.equalsPressed) {
-    		buffer.clear(); // clear the buffer if the last thing pressed was equals
-    		$scope.equalsPressed = false;
+    	// if the previous operation was unary or expression evaluation
+    	// then clear the buffer and register
+    	if(!$scope.tokenAllowed) {
+    		expression.clear()
+    		buffer.clear();
+    		$scope.tokenAllowed = true;
     	}
 
     	buffer.push(obj.value);
     });
 
     $scope.$on('pressed.keypad.decimal', function() {
-    	if ($scope.equalsPressed) {
-    		buffer.clear(); // clear the buffer if the last thing pressed was equals
-    		$scope.equalsPressed = false;
+    	// if the previous operation was unary or expression evaluation
+    	// then clear the buffer and register
+    	if(!$scope.tokenAllowed) {
+    		expression.clear();
+    		buffer.clear();
+    		$scope.tokenAllowed = true;
     	}
 
-    	// If decimal has not been pressed, then push into the buffer
-    	if(! $scope.decimalPressed) {
+    	// if the buffer already is a decimal number, we cannot add more decimals
+    	if($scope.decimalAllowed) {
     		buffer.push('.');
-    		$scope.decimalPressed = true;
+    		$scope.decimalAllowed = false;
     	}
-    	// Otherwise, do nothing since we don't want multiple decimals in the buffer
     });
 
     $scope.$on('pressed.keypad.binary_operator', function(event, obj) {
-			$scope.decimalPressed = false;
-
-    	var operator = obj.binary_operator;
-    	var result = buffer.eval();
-    	if (result) {
-    		expression.push(result); // push the evaluated buffer if it isn't zero
-    	}
-
-    	if (expression.valid()) {
-    		expression.push(operator);
+    	// if buffer is empty and expression ends with another operator
+    	// replace that operator with the current one, but don't push an empty buffer
+    	if(buffer.isEmpty() && !expression.valid()) {
+    		expression.pop();
     	} else {
-    		// If another operator has been pressed
-    		expression.pop(); // pop that operator from the expression
-    		expression.push(operator); // replace it with the current operator
+    		expression.push(buffer.eval());
     	}
 
+    	expression.push(obj.binary_operator); // push binary operator onto expression stack
     	buffer.clear(); // clear the buffer
+    	
+    	$scope.decimalAllowed = true;
+    	$scope.tokenAllowed = true;
     });
 
     $scope.$on('pressed.keypad.unary_operator', function(event, obj) {
-    	var operation = obj.unary_operation; // this is a function
-    	var result = operation(buffer.eval());
+    	var result = obj.unary_operation(buffer.eval()); // apply unary operation to contents of buffer
+    	buffer.clear().push(result); // clear the buffer and push the result
 
-    	buffer.clear().push(result); // clear buffer and push the result back on
+    	$scope.tokenAllowed = false;
     });
 
     $scope.$on('pressed.keypad.equals', function(event, obj) {
-    	if ($scope.equalsPressed) {
-    		expression.clear();
-    	}
+    	expression.push(buffer.eval()); // evaluate the expression and push onto stack
 
-    	var result = expression.push(buffer.eval()).eval(); // push the evaluated buffer to the expression stack and evaluate it
-    	buffer.clear(); // clear the buffer
-    	expression.clear().push(result); // clear the expression stack and push the result of the evaluated expression
-    	
-    	// display the result without saving it in the buffer
-    	if (! $scope.equalsPressed) {
-    		buffer.push(result);
-    	}
+    	buffer.clear().push(expression.eval()); // replace the buffer with the evaluated expression
+    	expression.clear(); // clear the expression stack
 
-    	$scope.decimalPressed = false; // allow decimals to be pressed
-    	$scope.equalsPressed = true;
+    	$scope.decimalAllowed = true;
+    	$scope.tokenAllowed = false; // have to clear the buffer before we do anything involving numbers
     });
 
     $scope.$on('pressed.keypad.clear', function() {
-    	$scope.decimalPressed = false;
-    	expression.clear(); // clear the expression stack
-    	buffer.clear(); // clear the buffer
+    	expression.clear();
+    	buffer.clear();
+
+    	$scope.decimalAllowed = true;
+    	$scope.tokenAllowed = true;
+    });
+
+    $scope.$on('pressed.keypad.m+', function() {
+    	// add buffer amount to register value
+    	$scope.memoryRegister += buffer.eval();
+    });
+
+    $scope.$on('pressed.keypad.m-', function() {
+    	// subtract value of memory register by buffer amount
+    	$scope.memoryRegister -= buffer.eval();
+    });
+
+    $scope.$on('pressed.keypad.mc', function() {
+    	// clear register value
+    	$scope.memoryRegister = 0;
+    });
+
+    $scope.$on('pressed.keypad.mr', function() {
+    	// replace contents of buffer with register value
+    	buffer.clear().push($scope.memoryRegister);
     });
   });

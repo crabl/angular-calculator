@@ -81,4 +81,9 @@ angular.module('angularCalculatorApp')
     	console.log('Clear button pressed');
     	$scope.$emit('pressed.keypad.clear');
     };
+
+    $scope.memoryKeyPressed = function(value) {
+    	console.log('Memory button ' + value + ' pressed');
+    	$scope.$emit('pressed.keypad.' + value);
+    };
   });

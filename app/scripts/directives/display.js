@@ -12,7 +12,7 @@ angular.module('angularCalculatorApp')
     	scope: {
     		contents: '@'
     	},
-      template: '<input type="text" value="{{contents}}"></input>',
+      template: '<input type="text" value="{{contents}}" class="col-md-12"></input>',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
         //element.text('this is the display directive');
